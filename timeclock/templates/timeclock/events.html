@@ -1,0 +1,56 @@
+<a href="{% url 'timeclock:clockIn' %}">Clock-In</a>
+</br>
+<a href="{% url 'timeclock:clockOut' %}">Clock-Out</a>
+<p><a href="{% url 'timeclock:summary' %}">Last full 2 week summary</a></p>
+<p><a href="{% url 'logout' %}">logout</a></p>
+{% load l10n %}
+{% localize on %}
+<table>
+	{% for week in object_list.weeks %}
+		<tr>
+			<th>date</th>
+			<th>Time In</th>
+			<th>Time Out</th>
+			<th>Hours</th>
+		</tr>
+		{% for event in week %}
+			<tr>
+				<td>{{event.date|date:'N d, Y' }}</td>
+				<td>{{event.time_in|date:'h:i A'}}</td>
+				<td>{{event.time_out|date:'h:i A'}}</td>
+				<td>{{event.get_hours}}</td>
+			</tr>
+		{% endfor %}
+		<tr>
+			<th></th>
+			<th></th>
+			<th></th>
+			<th></th>
+			<th>OT</th>
+			<th>Total</th>
+		</tr>
+		<tr>
+			<th></th>
+			<th></th>
+			<th></th>
+			<th>{{week.reg}}</th>
+			<th>{{week.ot}}</th>
+			<th>{{week.total}}</th>
+		</tr>
+	{% endfor %}
+</table>
+<br/>
+Totals from last 2 weeks
+<table>
+		<tr>
+			<th>Reg</th>
+			<th>OT</th>
+			<th>Total</th>
+		</tr>
+		<tr>
+			<th>{{object_list.paydata.reg}}</th>
+			<th>{{object_list.paydata.ot}}</th>
+			<th>{{object_list.paydata.total}}</th>
+		</tr>
+</table>
+{% endlocalize %}
