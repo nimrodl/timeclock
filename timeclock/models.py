@@ -72,4 +72,6 @@ def save_Event(sender, instance, **kwargs):
                     datetime.datetime.combine(instance.date,instance.time_out) - 
                     datetime.datetime.combine(instance.date,instance.time_in)
                     ).total_seconds() / 3600
+    else:
+        instance.hours = None
 
