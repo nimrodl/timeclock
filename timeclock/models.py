@@ -1,3 +1,4 @@
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.dispatch import receiver
 from django.db.models import DateField, FloatField, ExpressionWrapper, F, Case, When, Sum, Value
@@ -7,11 +8,10 @@ from django.utils import timezone
 import datetime
 from dateutil.relativedelta import *
 
-class Staff(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    cardnum = models.IntegerField()
-    def __str__(self):
-        return self.user.username
+class User(AbstractUser):
+    cardnum = models.IntegerField(blank=True, null=True, unique=True)
+    pin = models.IntegerField(unique=True)
+    REQUIRED_FIELDS = ['pin']
 
 class EventQuerySet(models.QuerySet):
     def all(self):
@@ -55,7 +55,7 @@ class Event(models.Model):
     date = models.DateField(default=datetime.date.today)
     time_in = models.TimeField(null=True, blank=True)
     time_out = models.TimeField(null=True, blank=True)
-    hours = models.FloatField(null=True, blank=True)
+    hours = models.FloatField(null=True, blank=True, editable=False)
     @property
     def get_hours(self):
         return round(self.hours,2) if self.hours else ""
