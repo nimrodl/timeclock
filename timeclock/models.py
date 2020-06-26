@@ -68,9 +68,11 @@ class Event(models.Model):
 @receiver(models.signals.pre_save, sender=Event)
 def save_Event(sender, instance, **kwargs):
     if instance.time_in and instance.time_out:
+        start = datetime.time(7,45,0)
+        time_in = start if instance.time_in < start else instance.time_in
         instance.hours = (
                     datetime.datetime.combine(instance.date,instance.time_out) - 
-                    datetime.datetime.combine(instance.date,instance.time_in)
+                    datetime.datetime.combine(instance.date,time_in)
                     ).total_seconds() / 3600
     else:
         instance.hours = None
