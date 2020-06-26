@@ -44,7 +44,7 @@ def clockIn(request):
     user.event_set.create(
             time_in=timezone.localtime().replace(second=0,microsecond=0).time()
             )
-    return HttpResponseRedirect(reverse('timeclock:user'))
+    return HttpResponseRedirect(reverse('timeclock:logout'))
 
 @login_required
 def clockOut(request):
@@ -58,5 +58,5 @@ def clockOut(request):
         else:
             latest.time_out = timezone.localtime().replace(second=0,microsecond=0).time()
             latest.save()
-    return HttpResponseRedirect(reverse('timeclock:user'))
+    return HttpResponseRedirect(reverse('timeclock:logout'))
 
