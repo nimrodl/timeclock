@@ -88,6 +88,11 @@ DATABASES = {
 
 AUTH_USER_MODEL = 'timeclock.User'
 
+AUTHENTICATION_BACKENDS = [
+        'django.contrib.auth.backends.ModelBackend',
+        'timeclock.auth.PinAuth',
+        ]
+
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
 
@@ -126,3 +131,4 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+LOGIN_REDIRECT_URL = '/timeclock/'

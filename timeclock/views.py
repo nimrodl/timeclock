@@ -15,6 +15,7 @@ class IndexView(generic.ListView):
     template_name = 'timeclock/index.html'
 
 class UserEventView(LoginRequiredMixin, generic.ListView):
+    login_url = '/timeclock/login/'
     model = Event
     template_name = 'timeclock/events.html'
     def get_queryset(self):
