@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.urls import path, include
+from django.urls import path, include, reverse_lazy
 from django.contrib import auth
 from django.contrib.auth.views import LoginView, LogoutView
 
@@ -12,7 +12,7 @@ urlpatterns = [
         path('clockIn', views.clockIn, name='clockIn'),
         path('clockOut', views.clockOut, name='clockOut'),
         path('login/', LoginView.as_view( authentication_form=forms.MyLoginForm,), name='login',),
-        path('logout/', LogoutView.as_view( next_page='/timeclock/' ), name='logout',),
+        path('logout/', LogoutView.as_view( next_page=reverse_lazy('timeclock:user')), name='logout',),
 ]
 
 

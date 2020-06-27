@@ -2,7 +2,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.views import generic
 from django.utils import timezone
 from django.db.models import Sum
@@ -10,12 +10,8 @@ import datetime
 
 from .models import User, Event
 
-class IndexView(generic.ListView):
-    model = User
-    template_name = 'timeclock/index.html'
-
 class UserEventView(LoginRequiredMixin, generic.ListView):
-    login_url = '/timeclock/login/'
+    login_url = reverse_lazy('timeclock:login')
     model = Event
     template_name = 'timeclock/events.html'
     def get_queryset(self):
