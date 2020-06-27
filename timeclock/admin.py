@@ -14,7 +14,7 @@ class UserAdmin(BaseUserAdmin):
             (None, {'fields':('pin','cardnum',)}),
             )
     add_fieldsets = BaseUserAdmin.add_fieldsets + (
-            (None, {'fields':('pin','cardnum',)}),
+            (None, {'fields':('first_name','pin','cardnum',)}),
             )
     inlines = [EventInline, ]
 
