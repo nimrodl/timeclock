@@ -44,6 +44,7 @@ table{
 				<td>{{event.get_hours}}</td>
 			</tr>
 		{% endfor %}
+		{% if week %}
 		<tr>
 			<th>Week Total</th>
 			<th></th>
@@ -52,9 +53,10 @@ table{
 			<th>{{week.ot}}</th>
 			<th>{{week.total}}</th>
 		</tr>
+		{% endif %}
 		{% if forloop.revcounter0 == 1 %}
 		<tr>
-			<th>2 Week Total</th>
+			<th>Previous<br/>2 Week Total</th>
 			<th></th>
 			<th></th>
 			<th>{{object_list.paydata.reg}}</th>
