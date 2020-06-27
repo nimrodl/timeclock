@@ -25,29 +25,25 @@ class UserEventView(LoginRequiredMixin, generic.ListView):
             context['summary'][user.first_name]=Event.objects.filter(user = user.id).paydata
         return context
 
-def card(request, cardnum):
-    user = get_object_or_404(User, staff__cardnum=cardnum)
-    return HttpResponseRedirect(reverse('timeclock:user'))
+class clockIn(generic.View, LoginRequiredMixin):
+    login_url = reverse_lazy('timeclock:login')
+    def get(self, request, *args, **kwargs):
+        self.request.user.event_set.create(
+                time_in=timezone.localtime().replace(second=0,microsecond=0).time()
+                )
+        return HttpResponseRedirect(reverse('timeclock:logout'))
 
-@login_required
-def clockIn(request):
-    user = get_object_or_404(User, pk=request.user.id)
-    user.event_set.create(
-            time_in=timezone.localtime().replace(second=0,microsecond=0).time()
-            )
-    return HttpResponseRedirect(reverse('timeclock:logout'))
-
-@login_required
-def clockOut(request):
-    user = get_object_or_404(User, pk=request.user.id)
-    if user.event_set.all():
-        latest = user.event_set.latest('date','time_in')
-        if latest.time_out:
-            user.event_set.create(
-                    time_out=timezone.localtime().replace(second=0,microsecond=0).time()
-                    )
-        else:
-            latest.time_out = timezone.localtime().replace(second=0,microsecond=0).time()
-            latest.save()
-    return HttpResponseRedirect(reverse('timeclock:logout'))
+class clockOut(generic.View, LoginRequiredMixin):
+    login_url = reverse_lazy('timeclock:login')
+    def get(self, request, *args, **kwargs):
+        if self.request.user.event_set.all():
+            latest = self.request.user.event_set.latest('date','time_in')
+            if latest.time_out:
+                self.request.user.event_set.create(
+                        time_out=timezone.localtime().replace(second=0,microsecond=0).time()
+                        )
+            else:
+                latest.time_out = timezone.localtime().replace(second=0,microsecond=0).time()
+                latest.save()
+        return HttpResponseRedirect(reverse('timeclock:logout'))
 

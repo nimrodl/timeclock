@@ -8,9 +8,8 @@ from . import views, forms
 app_name = 'timeclock'
 urlpatterns = [
         path('', views.UserEventView.as_view(), name='user'),
-        path('card/<int:cardnum>/', views.card, name='card'),
-        path('clockIn', views.clockIn, name='clockIn'),
-        path('clockOut', views.clockOut, name='clockOut'),
+        path('clockIn/', views.clockIn.as_view(), name='clockIn'),
+        path('clockOut/', views.clockOut.as_view(), name='clockOut'),
         path('login/', LoginView.as_view( authentication_form=forms.MyLoginForm,), name='login',),
         path('logout/', LogoutView.as_view( next_page=reverse_lazy('timeclock:user')), name='logout',),
 ]
