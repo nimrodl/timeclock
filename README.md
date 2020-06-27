@@ -11,8 +11,8 @@ Things that work:
  - displaying the current and previous 2 weeks of time entries
  - displaying summary of the previous 2 weeks of entries for payroll purposes including accountig for overtime over 40 hours per week
  - displaying all user summary information for all users if current user is_staff
+ - users have mandatory pin field that can be used as sole identifier (no user/pass) using /timeclock/login/
+ - event.html style is updated, but can use some improvement from someone who is better at UI than I am
  
  Things to do:
-  - make it look pretty
-  - alter login process to use rfid card as identifier
   - anything else I think of 
