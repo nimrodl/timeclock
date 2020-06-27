@@ -9,23 +9,16 @@
 		border-radius: 6px; 
 		outline: none; 
 	}
-</style>
-<a class="button" href="{% url 'timeclock:clockIn' %}">Clock-In</a>
-<a class="button" href="{% url 'timeclock:clockOut' %}">Clock-Out</a>
-{%if request.user.is_staff %}
-<p><a href="{% url 'timeclock:summary' %}">Last full 2 week summary</a></p>
-{% endif %}
-<p><a class="button" href="{% url 'timeclock:logout' %}">logout</a></p>
-<style type="text/css" media="screen">
-
-table{
-	border-collapse:collapse;
-	border:1px solid #FF0000;
-}
-
+	table{
+		border-collapse:collapse;
+		border:1px solid #FF0000;
+	}
 	table td{ border:1px solid #FF0000; padding:.5em; }
 	table th{ border:1px solid #FF0000; padding:.5em; }
 </style>
+<a class="button" href="{% url 'timeclock:clockIn' %}">Clock-In</a>
+<a class="button" href="{% url 'timeclock:clockOut' %}">Clock-Out</a>
+<p><a class="button" href="{% url 'timeclock:logout' %}">logout</a></p>
 <table>
 	<tr>
 		<th>date</th>
@@ -54,15 +47,25 @@ table{
 			<th>{{week.total}}</th>
 		</tr>
 		{% endif %}
-		{% if forloop.revcounter0 == 1 %}
+	{% endfor %}
+</table>
+
+<br/>
+
+<h3>Previous 2 Week Totals</h3>
+<table>
 		<tr>
-			<th>Previous<br/>2 Week Total</th>
-			<th></th>
-			<th></th>
-			<th>{{object_list.paydata.reg}}</th>
-			<th>{{object_list.paydata.ot}}</th>
-			<th>{{object_list.paydata.total}}</th>
+			<th>user</th>
+			<th>Reg</th>
+			<th>OT</th>
+			<th>Total</th>
 		</tr>
-		{% endif %}
+	{% for user,data in summary.items %}
+		<tr>
+			<td>{{user}}</td>
+			<td>{{data.reg}}</td>
+			<td>{{data.ot}}</td>
+			<td>{{data.total}}</td>
+		</tr>
 	{% endfor %}
 </table>

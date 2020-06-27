@@ -21,18 +21,13 @@ class UserEventView(LoginRequiredMixin, generic.ListView):
     def get_queryset(self):
         queryset = Event.objects.filter(user = self.request.user.id )
         return queryset
-
-class SummaryView(LoginRequiredMixin, generic.ListView):
-    model = User
-    template_name = 'timeclock/summary.html'
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user_list = User.objects.all() if self.request.user.is_staff else User.objects.filter(id = self.request.user.id)
-        context['data_list']={}
+        context['summary'] = {}
         for user in user_list:
-            context['data_list'][user.first_name]=Event.objects.filter(user = user.id).paydata
+            context['summary'][user.first_name]=Event.objects.filter(user = user.id).paydata
         return context
-
 
 def card(request, cardnum):
     user = get_object_or_404(User, staff__cardnum=cardnum)
