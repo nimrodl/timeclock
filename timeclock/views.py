@@ -12,7 +12,6 @@ from .models import User, Event
 
 class UserEventView(LoginRequiredMixin, generic.ListView):
     login_url = reverse_lazy('timeclock:login')
-    model = Event
     template_name = 'timeclock/events.html'
     def get_queryset(self):
         queryset = Event.objects.filter(user = self.request.user.id )
@@ -25,7 +24,7 @@ class UserEventView(LoginRequiredMixin, generic.ListView):
             context['summary'][user.first_name]=Event.objects.filter(user = user.id).paydata
         return context
 
-class clockIn(generic.View, LoginRequiredMixin):
+class clockIn(LoginRequiredMixin, generic.View):
     login_url = reverse_lazy('timeclock:login')
     def get(self, request, *args, **kwargs):
         self.request.user.event_set.create(
@@ -33,17 +32,19 @@ class clockIn(generic.View, LoginRequiredMixin):
                 )
         return HttpResponseRedirect(reverse('timeclock:logout'))
 
-class clockOut(generic.View, LoginRequiredMixin):
+class clockOut(LoginRequiredMixin, generic.View):
     login_url = reverse_lazy('timeclock:login')
     def get(self, request, *args, **kwargs):
-        if self.request.user.event_set.all():
+        try:
             latest = self.request.user.event_set.latest('date','time_in')
-            if latest.time_out:
-                self.request.user.event_set.create(
-                        time_out=timezone.localtime().replace(second=0,microsecond=0).time()
-                        )
+            if latest.date != timezone.localdate() or latest.time_out != None:
+                raise Event.DoesNotExist
             else:
                 latest.time_out = timezone.localtime().replace(second=0,microsecond=0).time()
                 latest.save()
+        except Event.DoesNotExist:
+            self.request.user.event_set.create(
+                    time_out=timezone.localtime().replace(second=0,microsecond=0).time()
+                    )
         return HttpResponseRedirect(reverse('timeclock:logout'))
 
