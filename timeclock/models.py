@@ -36,9 +36,9 @@ class EventQuerySet(models.QuerySet):
                 self.week(-1),
                 self.week(0),
                 ]
-    def week(self, index=0, day=timezone.now()):
-        sun = (day + relativedelta(weekday=SU, weeks=-1+index)).date()
-        sat = (day + relativedelta(weekday=SA, weeks=-0+index)).date()
+    def week(self, index=0, day=timezone.localdate()):
+        sun = (day + relativedelta(weekday=SU, weeks=-1+index))
+        sat = (day + relativedelta(weekday=SA, weeks=-0+index))
         qs = self.filter(date__range=[sun,sat])
         return qs
     @property
