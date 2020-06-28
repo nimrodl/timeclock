@@ -24,11 +24,14 @@ class UserEventView(LoginRequiredMixin, generic.ListView):
             context['summary'][user.first_name]=Event.objects.filter(user = user.id).paydata
         return context
 
+def get_time():
+    return timezone.localtime().replace(second=0,microsecond=0).time()
+
 class clockIn(LoginRequiredMixin, generic.View):
     login_url = reverse_lazy('timeclock:login')
     def get(self, request, *args, **kwargs):
         self.request.user.event_set.create(
-                time_in=timezone.localtime().replace(second=0,microsecond=0).time()
+                time_in=get_time()
                 )
         return HttpResponseRedirect(reverse('timeclock:logout'))
 
@@ -40,11 +43,11 @@ class clockOut(LoginRequiredMixin, generic.View):
             if latest.date != timezone.localdate() or latest.time_out != None:
                 raise Event.DoesNotExist
             else:
-                latest.time_out = timezone.localtime().replace(second=0,microsecond=0).time()
+                latest.time_out = get_time()
                 latest.save()
         except Event.DoesNotExist:
             self.request.user.event_set.create(
-                    time_out=timezone.localtime().replace(second=0,microsecond=0).time()
+                    time_out=get_time()
                     )
         return HttpResponseRedirect(reverse('timeclock:logout'))
 
