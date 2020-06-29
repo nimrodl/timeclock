@@ -11,7 +11,7 @@ urlpatterns = [
         path('clockIn/', views.clockIn.as_view(), name='clockIn'),
         path('clockOut/', views.clockOut.as_view(), name='clockOut'),
         path('login/', LoginView.as_view( authentication_form=forms.MyLoginForm,), name='login',),
-        path('logout/', LogoutView.as_view( next_page='/'), name='logout',),
+        path('logout/', LogoutView.as_view( next_page=reverse_lazy('timeclock:calendar')), name='logout',),
 ]
 
 
