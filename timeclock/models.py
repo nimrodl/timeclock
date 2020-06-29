@@ -29,13 +29,6 @@ class EventQuerySet(models.QuerySet):
     @property
     def ot(self):
         return round(self.total-40,2) if self.total>40 else 0
-    @property
-    def weeks(self):
-        return [
-                self.week(-2),
-                self.week(-1),
-                self.week(0),
-                ]
     def week(self, index=0, day=timezone.localdate()):
         sun = (day + relativedelta(weekday=SU, weeks=-1+index))
         sat = (day + relativedelta(weekday=SA, weeks=-1+index))
@@ -52,9 +45,10 @@ class EventQuerySet(models.QuerySet):
         out={}
         for user in self.week().values('user').order_by('user'):
             user_week = self.filter(user=user['user'])
+            user_pay = user_week.week(day=date)
             out[User.objects.get(pk=user['user']).first_name]={
-                    'reg': user_week.week(day=date).reg,
-                    'ot': user_week.week(day=date).ot,
+                    'reg': user_pay.reg,
+                    'ot': user_pay.ot,
                     }
         return out
 
