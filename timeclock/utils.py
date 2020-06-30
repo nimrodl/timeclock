@@ -14,7 +14,7 @@ class Calendar(HTMLCalendar):
                 events_per_day = events.filter(date__day=day).order_by('user','time_in')
                 d = ''
                 for event in events_per_day:
-                    d += f'<li> {event.user.first_name} {event.time_in} - {event.time_out} </li>'
+                    d += f'<li> {event.user.name} {event.time_in} - {event.time_out} </li>'
 
                 if day != 0:
                         return f"<td><span class='date'>{day}</span><ul> {d} </ul></td>"
@@ -36,7 +36,7 @@ class Calendar(HTMLCalendar):
                 sun = ""
                 for user, hours in pay.items():
                     ot=f'- ot: {hours["ot"]}' if hours["ot"] else ""
-                    sun += f'<li> {user} - reg: {hours["reg"]} {ot} </li>'
+                    sun += f'<li> {hours["name"]} - reg: {hours["reg"]} {ot} </li>'
                 week += f"<td class='sunday'><span class='date'>{sday}</span><ul> {sun} </ul></td>"
 
                 return f'<tr> {week} </tr>'

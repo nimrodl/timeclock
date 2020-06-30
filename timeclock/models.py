@@ -12,6 +12,9 @@ class User(AbstractUser):
     cardnum = models.IntegerField(blank=True, null=True, unique=True)
     pin = models.IntegerField(unique=True)
     REQUIRED_FIELDS = ['pin']
+    @property
+    def name(self):
+        return self.first_name + " " + self.last_name
 
 class EventQuerySet(models.QuerySet):
     def all(self):
@@ -46,7 +49,8 @@ class EventQuerySet(models.QuerySet):
         for user in self.week(day=date).values('user').order_by('user'):
             user_week = self.week(day=date).filter(user=user['user'])
             user_pay = user_week.week(day=date)
-            out[User.objects.get(pk=user['user']).first_name]={
+            out[ user['user'] ]={
+                    'name': User.objects.get(pk=user['user']).name,
                     'reg': user_pay.reg,
                     'ot': user_pay.ot,
                     }
@@ -63,7 +67,7 @@ class Event(models.Model):
     def get_hours(self):
         return round(self.hours,2) if self.hours else ""
     def __str__(self):
-        return self.user.first_name + " - " + str(self.date)
+        return self.user.name + " - " + str(self.date)
     class Meta:
         ordering = ['date', 'time_in', 'time_out']
 

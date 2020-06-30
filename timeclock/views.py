@@ -69,7 +69,10 @@ class CalendarView(LoginRequiredMixin, generic.ListView):
                 else User.objects.filter(id = self.request.user.id)
         context['summary'] = {}
         for user in user_list:
-            context['summary'][user.first_name]=Event.objects.filter(user = user.id).paydata
+            context['summary'][user.id]={
+                    'paydata': Event.objects.filter(user = user.id).paydata,
+                    'name': user.name,
+                    }
         return context
 
 def get_date(req_day):
