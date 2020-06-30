@@ -31,20 +31,20 @@ class EventQuerySet(models.QuerySet):
         return round(self.total-40,2) if self.total>40 else 0
     def week(self, index=0, day=timezone.localdate()):
         sun = (day + relativedelta(weekday=SU, weeks=-1+index))
-        sat = (day + relativedelta(weekday=SA, weeks=-1+index))
+        sat = (day + relativedelta(weekday=SA, weeks=-0+index))
         qs = self.filter(date__range=[sun,sat])
         return qs
     @property
     def paydata(self):
         out = { 'reg': self.week(-2).reg + self.week(-1).reg,
                 'ot': round(self.week(-2).ot + self.week(-1).ot,2),
-                'total': self.week(-2).total + self.week(-1).total,
+                'total': round(self.week(-2).total + self.week(-1).total,2),
                 }
         return out
     def week_pay(self, date=timezone.localdate()):
         out={}
-        for user in self.week().values('user').order_by('user'):
-            user_week = self.filter(user=user['user'])
+        for user in self.week(day=date).values('user').order_by('user'):
+            user_week = self.week(day=date).filter(user=user['user'])
             user_pay = user_week.week(day=date)
             out[User.objects.get(pk=user['user']).first_name]={
                     'reg': user_pay.reg,

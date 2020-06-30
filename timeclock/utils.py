@@ -16,13 +16,6 @@ class Calendar(HTMLCalendar):
                 for event in events_per_day:
                     d += f'<li> {event.user.first_name} {event.time_in} - {event.time_out} </li>'
 
-                if day and weekday(self.year, self.month, day)==6:
-                    date = datetime(self.year, self.month, day).date()
-                    pay = events.week_pay(date=date)
-                    for user, hours in pay.items():
-                        ot=f'- ot: {hours["ot"]}' if hours["ot"] else ""
-                        d += f'<li> {user} - reg: {hours["reg"]} {ot} </li>'
-                    return f"<td class='sunday'><span class='date'>{day}</span><ul> {d} </ul></td>"
                 if day != 0:
                         return f"<td><span class='date'>{day}</span><ul> {d} </ul></td>"
                 return '<td></td>'
@@ -30,8 +23,22 @@ class Calendar(HTMLCalendar):
         # formats a week as a tr 
         def formatweek(self, theweek, events):
                 week = ''
+                #pop sunday off so we don't send that to be formatted
+                day = theweek.pop()
+                #format days
                 for d, weekday in theweek:
                         week += self.formatday(d, events)
+
+                # get pay data for the full week (or at least the part of the week that falls in the current month
+                sday = day[0] if day[0] else ''
+                date = datetime(self.year, self.month, theweek[0][0] if theweek[0][0] else 1)
+                pay = events.week_pay(date=date)
+                sun = ""
+                for user, hours in pay.items():
+                    ot=f'- ot: {hours["ot"]}' if hours["ot"] else ""
+                    sun += f'<li> {user} - reg: {hours["reg"]} {ot} </li>'
+                week += f"<td class='sunday'><span class='date'>{sday}</span><ul> {sun} </ul></td>"
+
                 return f'<tr> {week} </tr>'
 
         # formats a month as a table
