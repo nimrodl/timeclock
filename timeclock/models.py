@@ -57,7 +57,7 @@ class EventQuerySet(models.QuerySet):
 
 class Event(models.Model):
     objects = models.Manager.from_queryset(EventQuerySet)()
-    user = models.ForeignKey(User, on_delete=models.CASCADE, editable=False)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     date = models.DateField(default=datetime.date.today)
     time_in = models.TimeField(null=True, blank=True)
     time_out = models.TimeField(null=True, blank=True)

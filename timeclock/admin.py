@@ -21,7 +21,7 @@ class UserAdmin(BaseUserAdmin):
 
 class EventAdmin(admin.ModelAdmin):
     list_display = ['user', 'date', 'time_in', 'time_out', 'get_hours']
-    list_editable = ['date', 'time_in', 'time_out']
+    list_editable = ['user','date', 'time_in', 'time_out']
     list_filter = (
             'user',
             ('date', DateRangeFilter),
