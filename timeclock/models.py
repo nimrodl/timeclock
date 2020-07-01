@@ -1,7 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.dispatch import receiver
-from django.db.models import DateField, FloatField, ExpressionWrapper, F, Case, When, Sum, Value
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.utils import timezone
@@ -22,16 +21,14 @@ class EventQuerySet(models.QuerySet):
         return qs
     @property
     def total(self):
-        if (self.aggregate(total=Sum('hours')))['total']:
-            return round((self.aggregate(total=Sum('hours')))['total'],2) 
-        else:
-            return 0
+        total = (self.aggregate(total=models.Sum('hours')))['total']
+        return round(total,2) if total else 0
     @property
     def reg(self):
         return 40 if self.total>40 else self.total
     @property
     def ot(self):
-        return round(self.total-40,2) if self.total>40 else 0
+        return self.total-40 if self.total>40 else 0
     def week(self, index=0, day=timezone.localdate()):
         sun = (day + relativedelta(weekday=SU, weeks=-1+index))
         sat = (day + relativedelta(weekday=SA, weeks=-0+index))
@@ -40,8 +37,8 @@ class EventQuerySet(models.QuerySet):
     @property
     def paydata(self):
         out = { 'reg': self.week(-2).reg + self.week(-1).reg,
-                'ot': round(self.week(-2).ot + self.week(-1).ot,2),
-                'total': round(self.week(-2).total + self.week(-1).total,2),
+                'ot': self.week(-2).ot + self.week(-1).ot,
+                'total': self.week(-2).total + self.week(-1).total,
                 }
         return out
     def week_pay(self, date=timezone.localdate()):
@@ -62,10 +59,7 @@ class Event(models.Model):
     date = models.DateField(default=datetime.date.today)
     time_in = models.TimeField(null=True, blank=True)
     time_out = models.TimeField(null=True, blank=True)
-    hours = models.FloatField(null=True, blank=True, editable=False)
-    @property
-    def get_hours(self):
-        return round(self.hours,2) if self.hours else ""
+    hours = models.DecimalField(decimal_places=2, max_digits=5, null=True, blank=True, editable=False)
     def __str__(self):
         return self.user.name + " - " + str(self.date)
     class Meta:
