@@ -7,7 +7,8 @@ from timeclock.models import User, Event
 class EventInline(admin.TabularInline):
     model = Event
     extra = 1
-    readonly_fields = ['hours']
+    readonly_fields = ['get_hours']
+    fields = ['date', 'time_in', 'time_out', 'get_hours']
 
 class UserAdmin(BaseUserAdmin):
     fieldsets = BaseUserAdmin.fieldsets + (
@@ -19,7 +20,7 @@ class UserAdmin(BaseUserAdmin):
     inlines = [EventInline, ]
 
 class EventAdmin(admin.ModelAdmin):
-    list_display = ['user', 'date', 'time_in', 'time_out', 'hours']
+    list_display = ['user', 'date', 'time_in', 'time_out', 'get_hours']
     list_editable = ['date', 'time_in', 'time_out']
     list_filter = (
             'user',

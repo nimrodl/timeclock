@@ -1,9 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.dispatch import receiver
-from django.db.models import DateField, FloatField, ExpressionWrapper, F, Case, When, Sum, Value
 from django.contrib.auth.models import User
-from django.core.exceptions import ValidationError
 from django.utils import timezone
 import datetime
 from dateutil.relativedelta import *
@@ -22,8 +20,9 @@ class EventQuerySet(models.QuerySet):
         return qs
     @property
     def total(self):
-        if (self.aggregate(total=Sum('hours')))['total']:
-            return round((self.aggregate(total=Sum('hours')))['total'],2) 
+        length = self.aggregate(length=models.Sum('length'))['length']
+        if length:
+            return round(length.total_seconds()/3600,2)
         else:
             return 0
     @property
@@ -62,10 +61,10 @@ class Event(models.Model):
     date = models.DateField(default=datetime.date.today)
     time_in = models.TimeField(null=True, blank=True)
     time_out = models.TimeField(null=True, blank=True)
-    hours = models.FloatField(null=True, blank=True, editable=False)
+    length = models.DurationField(null=True, blank=True, editable=False)
     @property
     def get_hours(self):
-        return round(self.hours,2) if self.hours else ""
+        return round(self.length.total_seconds()/3600,2) if self.length else ""
     def __str__(self):
         return self.user.name + " - " + str(self.date)
     class Meta:
@@ -77,10 +76,10 @@ def save_Event(sender, instance, **kwargs):
     if instance.time_in and instance.time_out:
         start = datetime.time(7,45,0)
         time_in = start if instance.time_in < start else instance.time_in
-        instance.hours = (
+        instance.length = (
                     datetime.datetime.combine(instance.date,instance.time_out) - 
                     datetime.datetime.combine(instance.date,time_in)
-                    ).total_seconds() / 3600
+                    )
     else:
-        instance.hours = None
+        instance.length = None
 
