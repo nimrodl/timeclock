@@ -62,9 +62,10 @@ class Event(models.Model):
     time_in = models.TimeField(null=True, blank=True)
     time_out = models.TimeField(null=True, blank=True)
     length = models.DurationField(null=True, blank=True, editable=False)
-    @property
     def get_hours(self):
         return round(self.length.total_seconds()/3600,2) if self.length else ""
+    get_hours.short_description="hours"
+    get_hours.admin_order_field="length"
     def __str__(self):
         return self.user.name + " - " + str(self.date)
     class Meta:
