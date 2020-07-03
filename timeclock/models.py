@@ -32,15 +32,19 @@ class EventQuerySet(models.QuerySet):
     def ot(self):
         return round(self.total-40,2) if self.total>40 else 0
     def week(self, index=0, day=timezone.localdate()):
-        sun = (day + relativedelta(weekday=SU, weeks=-1+index))
-        sat = (day + relativedelta(weekday=SA, weeks=-0+index))
+        sun = (day + relativedelta(weekday=MO, weeks=-1+index))
+        sat = (day + relativedelta(weekday=SU, weeks=-0+index))
         qs = self.filter(date__range=[sun,sat])
         return qs
     @property
-    def paydata(self):
-        out = { 'reg': self.week(-2).reg + self.week(-1).reg,
-                'ot': round(self.week(-2).ot + self.week(-1).ot,2),
-                'total': round(self.week(-2).total + self.week(-1).total,2),
+    def paydata(self, date=timezone.localdate()):
+        first = date + relativedelta(weekday=MO, weeks=-3)
+        last = date + relativedelta(weekday=SU, weeks=-1)
+        out = { 'reg': self.week(day=first).reg + self.week(day=last).reg,
+                'ot': round(self.week(day=first).ot + self.week(day=last).ot,2),
+                'total': round(self.week(day=first).total + self.week(day=last).total,2),
+                'first': first,
+                'last': last,
                 }
         return out
     def week_pay(self, date=timezone.localdate()):

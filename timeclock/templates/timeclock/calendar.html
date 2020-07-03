@@ -75,6 +75,10 @@ a {
 	<a class="btn btn-info right" href="{% url 'timeclock:calendar' %}?{{ next_month }}"> Next Month </a>
 	<table class='center payroll'>
 			<tr>
+				<th colspan=2>{{summary.1.paydata.first}}</th>
+				<th colspan=2>{{summary.1.paydata.last}}</th>
+			</tr>
+			<tr>
 				<th>user</th>
 				<th>Reg</th>
 				<th>OT</th>                                                                                                       <th>Total</th>
