@@ -33,7 +33,7 @@ class EventQuerySet(models.QuerySet):
         return round(self.total-40,2) if self.total>40 else 0
     def week(self, index=0, day=timezone.localdate()):
         sun = (day + relativedelta(weekday=MO, weeks=-1+index))
-        sat = (day + relativedelta(weekday=SU, weeks=-0+index))
+        sat = (day + relativedelta(weekday=SU, weeks=-1+index))
         qs = self.filter(date__range=[sun,sat])
         return qs
     @property
