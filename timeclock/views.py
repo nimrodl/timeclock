@@ -75,6 +75,15 @@ class CalendarView(LoginRequiredMixin, generic.ListView):
                     }
         return context
 
+    def render_to_response(self, context, **response_kwargs):
+            response = super().render_to_response(
+                    context, **response_kwargs
+            )
+            if 'HTTP_REFERER' in self.request.META and self.request.META['HTTP_REFERER'] == self.request.build_absolute_uri():
+                response['Refresh'] = "5;url=" + reverse('timeclock:logout')
+            return response
+
+
 def get_date(req_day):
     if req_day:
         year, month = (int(x) for x in req_day.split('-'))
