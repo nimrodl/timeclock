@@ -15,45 +15,41 @@ import calendar
 from .utils import Calendar
 from .models import User, Event
 
-def get_time():
-    return timezone.localtime().replace(second=0,microsecond=0).time()
-
-class clockIn(LoginRequiredMixin, generic.View):
-    login_url = reverse_lazy('timeclock:login')
-    def get(self, request, *args, **kwargs):
-        self.request.user.event_set.create(
-                time_in=get_time()
-                )
-        return HttpResponseRedirect(reverse('timeclock:calendar'))
-
-class clockOut(LoginRequiredMixin, generic.View):
-    login_url = reverse_lazy('timeclock:login')
-    def get(self, request, *args, **kwargs):
-        try:
-            latest = self.request.user.event_set.latest('date','time_in')
-            if latest.date != timezone.localdate() or latest.time_out != None:
-                raise Event.DoesNotExist
-            else:
-                latest.time_out = get_time()
-                latest.save()
-        except Event.DoesNotExist:
-            self.request.user.event_set.create(
-                    time_out=get_time()
-                    )
-        return HttpResponseRedirect(reverse('timeclock:calendar'))
-
-
 
 class CalendarView(LoginRequiredMixin, generic.ListView):
     login_url = reverse_lazy('timeclock:login')
     model = Event
     template_name = 'timeclock/calendar.html'
+    def get_time(self):
+        return timezone.localtime().replace(second=0,microsecond=0).time()
+    def clockIn(self):
+        self.request.user.event_set.create(
+                time_in=self.get_time()
+                )
+    def clockOut(self):
+        try:
+            latest = self.request.user.event_set.latest('date','time_in')
+            if latest.date != timezone.localdate() or latest.time_out != None:
+                raise Event.DoesNotExist
+            else:
+                latest.time_out = self.get_time()
+                latest.save()
+        except Event.DoesNotExist:
+            self.request.user.event_set.create(
+                    time_out=self.get_time()
+                    )
+
+
     def get_queryset(self):
         queryset = Event.objects.all() if self.request.user.is_staff \
             else Event.objects.filter(user = self.request.user.id)
         return queryset
 
     def get_context_data(self, **kwargs):
+        if self.request.META['PATH_INFO'] == '/clockIn/':
+            self.clockIn()
+        if self.request.META['PATH_INFO'] == '/clockOut/':
+            self.clockOut()
         context = super().get_context_data(**kwargs)
         # use today's date for the calendar
         d = get_date(self.request.GET.get('day', None))
@@ -83,10 +79,11 @@ class CalendarView(LoginRequiredMixin, generic.ListView):
             response = super().render_to_response(
                     context, **response_kwargs
             )
-            return response
-            if 'HTTP_REFERER' in self.request.META and self.request.META['HTTP_REFERER'] == self.request.build_absolute_uri():
+            if self.request.META['PATH_INFO'] == '/clockIn/' or self.request.META['PATH_INFO'] == '/clockOut/':
                 response['Refresh'] = "5;url=" + reverse('timeclock:logout')
             return response
+
+
 def get_paydate(req):
     if req:
         date = datetime.date.fromisoformat(req)
@@ -96,7 +93,6 @@ def get_paydate(req):
     # first pay period ever
     start = datetime.date(2020,6,8)
     # set date to start of payperiod
-    print(date, (date-start).days %14)
     date = date-datetime.timedelta(7) if ((date-start).days % 14) ==7 else date
     return date
 
