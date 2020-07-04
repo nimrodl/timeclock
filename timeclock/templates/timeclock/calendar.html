@@ -80,8 +80,7 @@ a {
 	<table class='center payroll'>
 			<tr>
 				<th><a class="btn btn-info" href="{% url 'timeclock:calendar' %}?{{ prev_pay }}"> prev </a></th>
-				<th>{{summary.1.paydata.first}}</th>
-				<th>{{summary.1.paydata.last}}</th>
+				<th colspan=2>{{summary.1.paydata.first}} - {{summary.1.paydata.last}}</th>
 				<th><a class="btn btn-info" href="{% url 'timeclock:calendar' %}?{{ next_pay }}"> next </a></th>
 			</tr>
 			<tr>
