@@ -39,7 +39,6 @@ class CalendarView(LoginRequiredMixin, generic.ListView):
                     time_out=self.get_time()
                     )
 
-
     def get_queryset(self):
         queryset = Event.objects.all() if self.request.user.is_staff \
             else Event.objects.filter(user = self.request.user.id)
@@ -54,11 +53,11 @@ class CalendarView(LoginRequiredMixin, generic.ListView):
         # use today's date for the calendar
         d = get_date(self.request.GET.get('day', None))
         d = get_date(self.request.GET.get('month', None))
-        context['prev_month'] = prev_month(d)
-        context['next_month'] = next_month(d)
         p = get_paydate(self.request.GET.get('paydate', None))
-        context['prev_pay'] = prev_pay(p)
-        context['next_pay'] = next_pay(p)
+        context['prev_month'] = prev_month(d) +"&"+cur_pay(p)
+        context['next_month'] = next_month(d) +"&"+cur_pay(p)
+        context['prev_pay'] = cur_month(d)+"&"+prev_pay(p)
+        context['next_pay'] = cur_month(d)+"&"+next_pay(p)
         # Instantiate our calendar class with today's year and date
         cal = Calendar(d.year, d.month)
         # Call the formatmonth method, which returns our calendar as a table
@@ -96,6 +95,9 @@ def get_paydate(req):
     date = date-datetime.timedelta(7) if ((date-start).days % 14) ==7 else date
     return date
 
+def cur_pay(date):
+    return 'paydate='+str(date)
+
 def prev_pay(date):
     return 'paydate='+str(date - datetime.timedelta(14))
 
@@ -108,6 +110,10 @@ def get_date(req_day):
         year, month = (int(x) for x in req_day.split('-'))
         return datetime.date(year, month, day=1)
     return datetime.datetime.today()
+
+def cur_month(d):
+    month = 'month=' + str(d.year) + '-' + str(d.month)
+    return month
 
 def prev_month(d):
     first = d.replace(day=1)
