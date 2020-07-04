@@ -35,6 +35,10 @@
   font-size: 16px;
 }
 
+.num {
+  text-align: right;
+}
+
 ul {
   height: 100%;
   padding: 0px 5px 0px 20px;
@@ -75,8 +79,10 @@ a {
 	<a class="btn btn-info right" href="{% url 'timeclock:calendar' %}?{{ next_month }}"> Next Month </a>
 	<table class='center payroll'>
 			<tr>
-				<th colspan=2>{{summary.1.paydata.first}}</th>
-				<th colspan=2>{{summary.1.paydata.last}}</th>
+				<th><a class="btn btn-info" href="{% url 'timeclock:calendar' %}?{{ prev_pay }}"> prev </a></th>
+				<th>{{summary.1.paydata.first}}</th>
+				<th>{{summary.1.paydata.last}}</th>
+				<th><a class="btn btn-info" href="{% url 'timeclock:calendar' %}?{{ next_pay }}"> next </a></th>
 			</tr>
 			<tr>
 				<th>user</th>
@@ -86,9 +92,9 @@ a {
 		{% for user,data in summary.items %}
 			<tr>
 				<td>{{data.name}}</td>
-				<td>{{data.paydata.reg}}</td>
-				<td>{{data.paydata.ot}}</td>
-				<td>{{data.paydata.total}}</td>
+				<td class=num>{{data.paydata.reg}}</td>
+				<td class=num>{{data.paydata.ot}}</td>
+				<td class=num>{{data.paydata.total}}</td>
 			</tr>
 		{% endfor %}
 	</table>

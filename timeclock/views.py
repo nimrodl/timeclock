@@ -7,6 +7,7 @@ from django.views import generic
 from django.utils import timezone
 from django.db.models import Sum
 import datetime
+from dateutil.relativedelta import *
 from django.shortcuts import render
 from django.utils.safestring import mark_safe
 import calendar
@@ -59,6 +60,9 @@ class CalendarView(LoginRequiredMixin, generic.ListView):
         d = get_date(self.request.GET.get('month', None))
         context['prev_month'] = prev_month(d)
         context['next_month'] = next_month(d)
+        p = get_paydate(self.request.GET.get('paydate', None))
+        context['prev_pay'] = prev_pay(p)
+        context['next_pay'] = next_pay(p)
         # Instantiate our calendar class with today's year and date
         cal = Calendar(d.year, d.month)
         # Call the formatmonth method, which returns our calendar as a table
@@ -70,7 +74,7 @@ class CalendarView(LoginRequiredMixin, generic.ListView):
         context['summary'] = {}
         for user in user_list:
             context['summary'][user.id]={
-                    'paydata': Event.objects.filter(user = user.id).paydata,
+                    'paydata': Event.objects.filter(user = user.id).paydata(date=p),
                     'name': user.name,
                     }
         return context
@@ -79,9 +83,28 @@ class CalendarView(LoginRequiredMixin, generic.ListView):
             response = super().render_to_response(
                     context, **response_kwargs
             )
+            return response
             if 'HTTP_REFERER' in self.request.META and self.request.META['HTTP_REFERER'] == self.request.build_absolute_uri():
                 response['Refresh'] = "5;url=" + reverse('timeclock:logout')
             return response
+def get_paydate(req):
+    if req:
+        date = datetime.date.fromisoformat(req)
+    else:
+        # date = previous monday
+        date = timezone.localdate() + relativedelta(weekday=MO, weeks=-1)
+    # first pay period ever
+    start = datetime.date(2020,6,8)
+    # set date to start of payperiod
+    print(date, (date-start).days %14)
+    date = date-datetime.timedelta(7) if ((date-start).days % 14) ==7 else date
+    return date
+
+def prev_pay(date):
+    return 'paydate='+str(date - datetime.timedelta(14))
+
+def next_pay(date):
+    return 'paydate='+str(date + datetime.timedelta(14))
 
 
 def get_date(req_day):

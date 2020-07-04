@@ -32,23 +32,24 @@ class EventQuerySet(models.QuerySet):
     def ot(self):
         return round(self.total-40,2) if self.total>40 else 0
     def week(self, index=0, day=timezone.localdate()):
-        sun = (day + relativedelta(weekday=MO, weeks=-1+index))
-        sat = (day + relativedelta(weekday=SU, weeks=-1+index))
-        qs = self.filter(date__range=[sun,sat])
+        mo = (day + relativedelta(weekday=MO))
+        su = (day + relativedelta(weekday=SU))
+        qs = self.filter(date__range=[mo,su])
         return qs
-    @property
     def paydata(self, date=timezone.localdate()):
-        first = date + relativedelta(weekday=MO, weeks=-3)
-        last = date + relativedelta(weekday=SU, weeks=-1)
-        out = { 'reg': self.week(day=first).reg + self.week(day=last).reg,
+        #get first and last mondays in payperiod
+        first = date
+        last = date + datetime.timedelta(7)
+        out = { 'reg': round(self.week(day=first).reg + self.week(day=last).reg,2),
                 'ot': round(self.week(day=first).ot + self.week(day=last).ot,2),
                 'total': round(self.week(day=first).total + self.week(day=last).total,2),
                 'first': first,
-                'last': last,
+                'last': last + datetime.timedelta(6),
                 }
         return out
     def week_pay(self, date=timezone.localdate()):
         out={}
+        date = (date + relativedelta(weekday=MO, weeks=-1)) if date.weekday()!=0 else date
         for user in self.week(day=date).values('user').order_by('user'):
             user_week = self.week(day=date).filter(user=user['user'])
             user_pay = user_week.week(day=date)
