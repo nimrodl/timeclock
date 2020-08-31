@@ -14,7 +14,9 @@ class Calendar(HTMLCalendar):
                 events_per_day = events.filter(date__day=day).order_by('user','time_in')
                 d = ''
                 for event in events_per_day:
-                    d += f'<li> {event.user.name} {event.time_in} - {event.time_out} </li>'
+                    time_in = event.time_in if event.time_in else '<span style="color:red">None</span>'
+                    time_out = event.time_out if event.time_out else '<span style="color:red">None</span>'
+                    d += f'<li> {event.user.name} {time_in} - {time_out} </li>'
 
                 if day != 0:
                         return f"<td><span class='date'>{day}</span><ul> {d} </ul></td>"
