@@ -80,10 +80,8 @@ class Event(models.Model):
 @receiver(models.signals.pre_save, sender=Event)
 def save_Event(sender, instance, **kwargs):
     if instance.time_in and instance.time_out:
-        if instance.date.weekday() in [1,3]:
-            start = datetime.time(7,25,0)
-        else:
-            start = datetime.time(7,45,0)
+        day = Schedule.objects.filter(day=instance.date.weekday()).first()
+        start = day.start if day else instance.time_in
         time_in = start if instance.time_in < start else instance.time_in
         instance.length = (
                     datetime.datetime.combine(instance.date,instance.time_out) - 
@@ -92,3 +90,18 @@ def save_Event(sender, instance, **kwargs):
     else:
         instance.length = None
 
+class Schedule(models.Model):
+    DAYS = [
+            (0, 'Monday'),
+            (1, 'Tuesday'),
+            (2, 'Wednesday'),
+            (3, 'Thursday'),
+            (4, 'Friday'),
+            (5, 'Saturday'),
+            (6, 'Sunday'),
+            ]
+    day = models.IntegerField(choices=DAYS)
+    start = models.TimeField()
+    end = models.TimeField(null=True, blank=True)
+    def __str__(self):
+        return str(self.get_day_display()) + " - " + str(self.start) + " - " + str(self.end)

@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from rangefilter.filter import DateRangeFilter, DateTimeRangeFilter
 
-from timeclock.models import User, Event
+from timeclock.models import User, Event, Schedule
 
 class EventInline(admin.TabularInline):
     model = Event
@@ -30,3 +30,4 @@ class EventAdmin(admin.ModelAdmin):
 
 admin.site.register(User, UserAdmin)
 admin.site.register(Event, EventAdmin)
+admin.site.register(Schedule)
