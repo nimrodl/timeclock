@@ -58,13 +58,14 @@ class CalendarView(LoginRequiredMixin, generic.ListView):
         context['next_month'] = next_month(d) +"&"+cur_pay(p)
         context['prev_pay'] = cur_month(d)+"&"+prev_pay(p)
         context['next_pay'] = cur_month(d)+"&"+next_pay(p)
+        context['payperiod'] = str(get_paydate(str(p))) + " - " + str(get_paydate(str(p+datetime.timedelta(13))))
         # Instantiate our calendar class with today's year and date
         cal = Calendar(d.year, d.month)
         # Call the formatmonth method, which returns our calendar as a table
         html_cal = cal.formatmonth(withyear=True, event_list=context['object_list'])
         context['calendar'] = mark_safe(html_cal)
         # get summary data for payroll section below the calendar
-        user_list = User.objects.all().filter(is_staff=False).filter(is_active=True) if self.request.user.is_staff \
+        user_list = User.objects.filter(is_active=True, is_staff=False) if self.request.user.is_staff \
                 else User.objects.filter(id = self.request.user.id)
         context['summary'] = {}
         for user in user_list:
