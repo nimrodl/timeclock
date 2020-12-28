@@ -58,7 +58,8 @@ class CalendarView(LoginRequiredMixin, generic.ListView):
         context['next_month'] = next_month(d) +"&"+cur_pay(p)
         context['prev_pay'] = cur_month(d)+"&"+prev_pay(p)
         context['next_pay'] = cur_month(d)+"&"+next_pay(p)
-        context['payperiod'] = str(get_paydate(str(p))) + " - " + str(get_paydate(str(p+datetime.timedelta(13))))
+        context['pay_start'] = get_paydate(str(p)) #+ " - " + str(get_paydate(str(p+datetime.timedelta(13))))
+        context['pay_end'] = context['pay_start']+datetime.timedelta(13)
         # Instantiate our calendar class with today's year and date
         cal = Calendar(d.year, d.month)
         # Call the formatmonth method, which returns our calendar as a table
