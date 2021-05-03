@@ -66,7 +66,7 @@ class CalendarView(LoginRequiredMixin, generic.ListView):
         html_cal = cal.formatmonth(withyear=True, event_list=context['object_list'])
         context['calendar'] = mark_safe(html_cal)
         # get summary data for payroll section below the calendar
-        user_list = User.objects.filter(is_active=True, is_staff=False) if self.request.user.is_staff \
+        user_list = User.objects.filter(is_active=True, is_staff=False).order_by('last_name') if self.request.user.is_staff \
                 else User.objects.filter(id = self.request.user.id)
         context['summary'] = {}
         for user in user_list:
