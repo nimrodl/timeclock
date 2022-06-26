@@ -10,6 +10,7 @@ import datetime
 from dateutil.relativedelta import *
 from django.shortcuts import render
 from django.utils.safestring import mark_safe
+from django.contrib import messages
 import calendar
 
 from .utils import Calendar
@@ -22,10 +23,19 @@ class CalendarView(LoginRequiredMixin, generic.ListView):
     template_name = 'timeclock/calendar.html'
     def get_time(self):
         return timezone.localtime().replace(second=0,microsecond=0).time()
+
     def clockIn(self):
-        self.request.user.event_set.create(
-                time_in=self.get_time()
-                )
+        try:
+            latest = self.request.user.event_set.latest('date','time_in')
+            if latest.date == timezone.localdate() and latest.time_out == None:
+                raise Event.DoesNotExist
+            else:
+                self.request.user.event_set.create(
+                        time_in=self.get_time()
+                        )
+        except Event.DoesNotExist as e:
+            messages.error(self.request, "You are already clocked in today without clocking out")
+
     def clockOut(self):
         try:
             latest = self.request.user.event_set.latest('date','time_in')
@@ -35,9 +45,10 @@ class CalendarView(LoginRequiredMixin, generic.ListView):
                 latest.time_out = self.get_time()
                 latest.save()
         except Event.DoesNotExist:
-            self.request.user.event_set.create(
-                    time_out=self.get_time()
-                    )
+            messages.error(self.request, "You are trying to clock out, but there is no clock in")
+            #self.request.user.event_set.create(
+            #        time_out=self.get_time()
+            #        )
 
     def get_queryset(self):
         queryset = Event.objects.all() if self.request.user.is_staff \
@@ -80,8 +91,8 @@ class CalendarView(LoginRequiredMixin, generic.ListView):
             response = super().render_to_response(
                     context, **response_kwargs
             )
-            if self.request.META['PATH_INFO'] == '/clockIn/' or self.request.META['PATH_INFO'] == '/clockOut/':
-                response['Refresh'] = "5;url=" + reverse('timeclock:logout')
+            if not messages.get_messages(self.request) and (self.request.META['PATH_INFO'] == '/clockIn/' or self.request.META['PATH_INFO'] == '/clockOut/'):
+                response['Refresh'] = "4;url=" + reverse('timeclock:logout')
             return response
 
 
