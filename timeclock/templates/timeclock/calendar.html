@@ -70,24 +70,37 @@ a {
   margin: 15px;
 }
 
-.sunday {
+.sun {
   background-color: lightgrey;
+}
+
+.other {
+  background-color: linen;
+}
+th.center {
+  text-align: center;
 }
 </style>
 <div class="clearfix">
-	<a class="btn btn-info left" href="{% url 'timeclock:calendar' %}?{{ prev_month }}"> Previous Month </a>
-	<a class="btn btn-info right" href="{% url 'timeclock:calendar' %}?{{ next_month }}"> Next Month </a>
 	<table class='center payroll'>
-			<tr>
-				<th><a class="btn btn-info" href="{% url 'timeclock:calendar' %}?{{ prev_pay }}"> prev </a></th>
-				<th colspan=2>{{pay_start}} - {{pay_end}}</th>
-				<th><a class="btn btn-info" href="{% url 'timeclock:calendar' %}?{{ next_pay }}"> next </a></th>
-			</tr>
-			<tr>
-				<th>user</th>
-				<th>Reg</th>
-				<th>OT</th>                                                                                                       <th>Total</th>
-			</tr>
+		<tr>
+			<th class="center" colspan=4><a class="btn btn-info" href="{% url 'timeclock:logout' %}"> Logout </a></th>
+		</tr>
+		<tr>
+			<th class="center" colspan=2><a class="btn btn-info" href="{% url 'timeclock:clockIn' %}"> Clock In </a></th>
+			<th class="center" colspan=2><a class="btn btn-info" href="{% url 'timeclock:clockOut' %}"> Clock Out </a></th>
+		</tr>
+		<tr>
+			<th class="center"><a class="btn btn-info" href="{% url 'timeclock:calendar' %}?{{ prev_pay }}"> prev </a></th>
+			<th colspan=2>{{pay_start}} - {{pay_end}}</th>
+			<th class="center"><a class="btn btn-info" href="{% url 'timeclock:calendar' %}?{{ next_pay }}"> next </a></th>
+		</tr>
+		<tr>
+			<th>user</th>
+			<th>Reg</th>
+			<th>OT</th>
+			<th>Total</th>
+		</tr>
 		{% for user,data in summary.items %}
 			<tr>
 				<td>{{data.name}}</td>
@@ -97,9 +110,6 @@ a {
 			</tr>
 		{% endfor %}
 	</table>
-	<a class="btn btn-info left" href="{% url 'timeclock:clockIn' %}"> Clock In </a>
-	<a class="btn btn-info" href="{% url 'timeclock:clockOut' %}"> Clock Out </a>
-	<a class="btn btn-info right" href="{% url 'timeclock:logout' %}"> Logout </a>
 </div>
 {{ calendar }}
 {% endblock %}

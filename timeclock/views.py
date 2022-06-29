@@ -51,8 +51,11 @@ class CalendarView(LoginRequiredMixin, generic.ListView):
             #        )
 
     def get_queryset(self):
-        queryset = Event.objects.all() if self.request.user.is_staff \
-            else Event.objects.filter(user = self.request.user.id)
+        d = get_date(self.request.GET.get('day', None))
+        d = get_date(self.request.GET.get('month', None))
+        qs = Event.objects.filter(date__in = Calendar().itermonthdates(d.year,d.month))
+        queryset = qs if self.request.user.is_staff \
+            else qs.filter(user = self.request.user.id)
         return queryset
 
     def get_context_data(self, **kwargs):
@@ -74,7 +77,7 @@ class CalendarView(LoginRequiredMixin, generic.ListView):
         # Instantiate our calendar class with today's year and date
         cal = Calendar(d.year, d.month)
         # Call the formatmonth method, which returns our calendar as a table
-        html_cal = cal.formatmonth(withyear=True, event_list=context['object_list'])
+        html_cal = cal.formatmonth(withyear=True, context=context)
         context['calendar'] = mark_safe(html_cal)
         # get summary data for payroll section below the calendar
         user_list = User.objects.filter(is_active=True, is_staff=False).order_by('last_name') if self.request.user.is_staff \
