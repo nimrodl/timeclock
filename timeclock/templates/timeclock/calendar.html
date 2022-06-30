@@ -96,10 +96,10 @@ th.center {
 			<th class="center"><a class="btn btn-info" href="{% url 'timeclock:calendar' %}?{{ next_pay }}"> next </a></th>
 		</tr>
 		<tr>
-			<th>user</th>
+			<th style="width:10em">user</th>
 			<th>Reg</th>
 			<th>OT</th>
-			<th>Total</th>
+			<th style="width:10em">Total</th>
 		</tr>
 		{% for user,data in summary.items %}
 			<tr>
