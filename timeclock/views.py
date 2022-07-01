@@ -28,13 +28,13 @@ class CalendarView(LoginRequiredMixin, generic.ListView):
         try:
             latest = self.request.user.event_set.latest('date','time_in')
             if latest.date == timezone.localdate() and latest.time_out == None:
-                raise Event.DoesNotExist
+                messages.error(self.request, "You are already clocked in today without clocking out")
             else:
+                raise Event.DoesNotExist
+        except Event.DoesNotExist as e:
                 self.request.user.event_set.create(
                         time_in=self.get_time()
                         )
-        except Event.DoesNotExist as e:
-            messages.error(self.request, "You are already clocked in today without clocking out")
 
     def clockOut(self):
         try:
@@ -45,10 +45,10 @@ class CalendarView(LoginRequiredMixin, generic.ListView):
                 latest.time_out = self.get_time()
                 latest.save()
         except Event.DoesNotExist:
-            messages.error(self.request, "You are trying to clock out, but there is no clock in")
-            #self.request.user.event_set.create(
-            #        time_out=self.get_time()
-            #        )
+            #messages.error(self.request, "You are clocked out, but did not clock in")
+            self.request.user.event_set.create(
+                    time_out=self.get_time()
+                    )
 
     def get_queryset(self):
         d = get_date(self.request.GET.get('day', None))
