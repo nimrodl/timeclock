@@ -1,4 +1,4 @@
-Django==3.2.14
+Django==3.2.15
 django-admin-rangefilter==0.6.1
 python-dateutil==2.8.1
 gunicorn
